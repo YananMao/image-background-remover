@@ -7,41 +7,54 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-pages:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 核心修复：使用 Node 20 LTS 稳定版本，无兼容性问题
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      # 清理缓存，避免脏数据导致安装失败
-      - name: Clean npm cache
-        run: npm cache clean --force
-
-      # 安装与 Node20 完美兼容的稳定版 npm
-      - name: Install stable npm
-        run: npm install -g npm@10
-
-      # 安装项目依赖（开启详细日志，方便排查）
       - name: Install dependencies
-        run: npm install --verbose
+        run: npm install
 
-      # Next.js 生产环境构建
       - name: Build project
         run: npm run build
         env:
           NODE_ENV: production
 
-      # 部署到 Cloudflare Pages（你的项目配置完全保留）
+      - name: Convert to Cloudflare Pages format
+        run: npm install -D @opennextjs/cloudflare && npx @opennextjs/cloudflare build
+
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=image-background-remover
+          projectName: image-background-remover
+          directory: .open-next/standalone/.next
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy Worker
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
