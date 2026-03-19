@@ -39,7 +39,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: image-background-remover
-          directory: .open-next/standalone/.next
+          directory: .open-next/assets
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-worker:
