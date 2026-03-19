@@ -5,3 +5,9 @@ compatibility_date = "2024-01-01"
 
 [vars]
 ENVIRONMENT = "production"
+
+# REMOVEBG_API_KEY: 通过以下方式设置（不要硬编码在此文件）
+# 本地开发：在项目根目录创建 .dev.vars 文件，内容如下：
+#   REMOVEBG_API_KEY=your_api_key_here
+# 生产环境：运行命令设置 secret
+#   npx wrangler secret put REMOVEBG_API_KEY
