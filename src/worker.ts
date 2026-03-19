@@ -74,7 +74,7 @@ app.post('/api/remove-background', async (c) => {
       }
 
       console.error('remove.bg API error:', response.status, errorText)
-      return c.json({ error: errorMessage }, response.status)
+      return c.json({ error: errorMessage }, response.status as 400 | 402 | 429 | 500)
     }
 
     // 返回处理后的图片
