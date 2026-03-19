@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare
+name: Deploy to Cloudflare Pages
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  deploy-pages:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,35 +29,10 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
-
-      - name: Convert to Cloudflare Pages format
-        run: npm install -D @opennextjs/cloudflare && npx @opennextjs/cloudflare build
+          REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: image-background-remover
-          directory: .open-next/assets
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy-worker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Deploy Worker
-        run: npx wrangler deploy
+        run: npx wrangler pages deploy .next --project-name=image-background-remover --commit-message="Deploy from GitHub Actions"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
