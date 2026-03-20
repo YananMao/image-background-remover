@@ -27,7 +27,7 @@ jobs:
           npm ci
 
       - name: Build Next.js
-        run: npm run build
+        run: npx next build
         env:
           REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
