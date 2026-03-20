@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy:worker": "wrangler deploy",
-    "deploy:pages": "npm run build && wrangler pages deploy .next --project-name=image-background-remover"
+    "deploy": "npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "hono": "^4.12.8",

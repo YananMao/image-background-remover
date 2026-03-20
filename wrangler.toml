@@ -1,6 +1,16 @@
-# Cloudflare Workers 配置
+# Cloudflare Workers 配置 (OpenNext)
 name = "image-background-remover"
-compatibility_date = "2024-01-01"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "image-background-remover"
 
 [vars]
 ENVIRONMENT = "production"

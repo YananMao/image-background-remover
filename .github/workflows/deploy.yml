@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -18,23 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug - List files
-        run: |
-          ls -la
-          echo "--- package-lock.json ---"
-          ls -la package-lock.json 2>/dev/null || echo "NOT FOUND"
-          head -5 package-lock.json 2>/dev/null || echo "CANNOT READ"
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          npm ci --include=dev
-          echo "Checking @opennextjs/cloudflare..."
-          ls -la node_modules/@opennextjs/cloudflare 2>/dev/null || echo "NOT FOUND"
+        run: npm ci --include=dev
 
       - name: Build and Deploy to Cloudflare Workers
         run: npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy
