@@ -16,10 +16,10 @@
 
 ## 技术栈
 
-- **前端**: Next.js 16 + React 19 + Tailwind CSS 4
-- **后端**: Next.js API Routes / Cloudflare Workers + Hono
+- **前端**: Next.js 16 + React 19 + Tailwind CSS 4（静态导出部署到 Cloudflare Pages）
+- **后端**: Cloudflare Workers + Hono
 - **第三方服务**: remove.bg API
-- **部署**: Cloudflare Pages + Workers
+- **部署**: Cloudflare Pages（前端）+ Cloudflare Workers（API）
 
 ## 快速开始
 
@@ -31,23 +31,29 @@ npm install
 
 ### 2. 配置环境变量
 
-复制 `.env.example` 为 `.env.local`，并填入你的 remove.bg API Key：
-
-```bash
-cp .env.example .env.local
-```
-
-编辑 `.env.local`：
+**Worker 后端**：在项目根目录创建 `.dev.vars`，填入 remove.bg API Key：
 
 ```
 REMOVEBG_API_KEY=你的API密钥
+```
+
+**前端**：复制 `.env.example` 为 `.env.local`，配置 Worker 地址：
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:8787
 ```
 
 > 获取 API Key: https://www.remove.bg/api
 
 ### 3. 启动开发服务器
 
+需要同时运行前端和 Worker：
+
 ```bash
+# 终端 1：启动 Worker API
+npm run dev:worker
+
+# 终端 2：启动前端
 npm run dev
 ```
 
@@ -61,31 +67,39 @@ npm run build
 
 ## 部署
 
-### 部署到 Cloudflare Pages
+项目拆分为两个独立部署：
 
-1. 安装 Wrangler CLI 并登录：
+- **Cloudflare Workers** (`image-background-remover-api`)：后端 API
+- **Cloudflare Pages** (`image-background-remover`)：前端静态页面
+
+### 一键部署
 
 ```bash
-npx wrangler login
+npm run deploy
 ```
 
-2. 部署：
+会依次执行 `deploy:worker` 和 `deploy:pages`。
+
+### 分别部署
 
 ```bash
+# 1. 部署 Worker API
+npm run deploy:worker
+
+# 2. 部署前端（需先设置 NEXT_PUBLIC_API_URL 为 Worker 的 URL）
 npm run deploy:pages
 ```
 
-### 部署 Workers API（可选）
+### GitHub Actions
 
-如果需要将 API 部署到 Cloudflare Workers：
+推送到 `main` 分支或手动触发 workflow 会自动部署。
 
-1. 在 Cloudflare Dashboard 创建一个 Worker
-2. 设置环境变量 `REMOVEBG_API_KEY`
-3. 部署：
+**所需 GitHub Secrets**：
 
-```bash
-npm run deploy:worker
-```
+- `CLOUDFLARE_API_TOKEN` - Cloudflare API Token
+- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare 账户 ID
+- `REMOVEBG_API_KEY` - remove.bg API Key
+- `NEXT_PUBLIC_API_URL` - Worker 生产 URL（如 `https://image-background-remover-api.xxx.workers.dev`，首次部署 Worker 后从输出中获取）
 
 ## 项目结构
 
@@ -94,15 +108,13 @@ npm run deploy:worker
 │   ├── app/
 │   │   ├── page.tsx          # 主页面组件
 │   │   ├── layout.tsx        # 布局组件
-│   │   ├── globals.css       # 全局样式
-│   │   └── api/
-│   │       └── remove-background/
-│   │           └── route.ts  # Next.js API 路由
-│   └── worker.ts             # Cloudflare Workers 入口
+│   │   └── globals.css       # 全局样式
+│   └── worker.ts             # Cloudflare Workers API 入口 (Hono)
 ├── public/                   # 静态资源
-├── .env.local               # 本地环境变量（不提交）
-├── .env.example             # 环境变量示例
-├── wrangler.toml            # Cloudflare Workers 配置
+├── .dev.vars                 # Worker 本地环境变量（不提交）
+├── .env.local                # 前端本地环境变量（不提交）
+├── .env.example              # 环境变量示例
+├── wrangler.toml             # Cloudflare Workers 配置
 └── package.json
 ```
 
@@ -138,7 +150,7 @@ Content-Type: image/png
 
 - **Cloudflare Pages**: 免费
 - **Cloudflare Workers**: 免费额度 100,000 请求/天
-- **remove.bg API**: 
+- **remove.bg API**:
   - 免费版：50 次/月
   - 付费版：$0.20/张起
 

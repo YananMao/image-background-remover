@@ -55,7 +55,8 @@ export default function Home() {
       const formData = new FormData();
       formData.append("file", blob, "image.png");
 
-      const apiResponse = await fetch("/api/remove-background", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const apiResponse = await fetch(`${apiUrl}/api/remove-background`, {
         method: "POST",
         body: formData,
       });

@@ -4,10 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:worker": "wrangler dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "deploy": "npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy"
+    "deploy:pages": "next build && npx wrangler pages deploy out --project-name=image-background-remover",
+    "deploy:worker": "npx wrangler deploy",
+    "deploy": "npm run deploy:worker && npm run deploy:pages"
   },
   "dependencies": {
     "hono": "^4.12.8",
@@ -19,7 +22,6 @@
     "wrangler": "^4.74.0"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.17.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
