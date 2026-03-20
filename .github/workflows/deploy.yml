@@ -41,8 +41,8 @@ jobs:
         env:
           REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
-      - name: Deploy to Cloudflare
-        run: npx opennextjs-cloudflare deploy
+      - name: Deploy to Cloudflare Pages
+        run: npx wrangler pages deploy .open-next
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
