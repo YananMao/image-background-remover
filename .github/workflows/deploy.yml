@@ -42,7 +42,7 @@ jobs:
           REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy .open-next
+        run: npx wrangler pages deploy .open-next --project-name=image-background-remover
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
