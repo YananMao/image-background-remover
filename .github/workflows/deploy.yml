@@ -15,6 +15,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Debug - List files
+        run: |
+          ls -la
+          echo "--- package-lock.json ---"
+          ls -la package-lock.json 2>/dev/null || echo "NOT FOUND"
+          head -5 package-lock.json 2>/dev/null || echo "CANNOT READ"
 
       - name: Setup Node
         uses: actions/setup-node@v4
