@@ -1,8 +1,7 @@
-import type { CloudflareConfig } from "@opennextjs/cloudflare";
+import { defineCloudflareConfig } from "@opennextjs/cloudflare";
 
-const config: CloudflareConfig = {
-  // 构建时不连接 Cloudflare API，用本地缓存
-  offline: true,
-};
+const config = defineCloudflareConfig({
+  // Cloudflare specific overrides can be added here
+});
 
 export default config;
