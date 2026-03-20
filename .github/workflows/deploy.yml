@@ -23,9 +23,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
-          ls -la node_modules/.bin/ | head -20
-          ls node_modules/@opennextjs/ 2>/dev/null || echo "@opennextjs not found"
+          npm ci --include=dev
+          echo "Checking @opennextjs/cloudflare..."
+          ls -la node_modules/@opennextjs/cloudflare 2>/dev/null || echo "NOT FOUND"
 
       - name: Build Next.js
         run: npx next build
