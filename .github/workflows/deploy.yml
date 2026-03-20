@@ -36,13 +36,22 @@ jobs:
           echo "Checking @opennextjs/cloudflare..."
           ls -la node_modules/@opennextjs/cloudflare 2>/dev/null || echo "NOT FOUND"
 
-      - name: Build Next.js
-        run: npx next build
+      - name: Build Next.js for Cloudflare
+        run: npx @opennextjs/cloudflare build
         env:
           REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
+      - name: Set Cloudflare Pages Secret
+        run: |
+          echo "${{ secrets.REMOVEBG_API_KEY }}" | npx wrangler pages secret put REMOVEBG_API_KEY \
+            --project-name=image-background-remover \
+            --yes
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy .next --project-name=image-background-remover --commit-message="Deploy from GitHub Actions"
+        run: npx wrangler pages deploy .open-next --project-name=image-background-remover --commit-message="Deploy from GitHub Actions"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
