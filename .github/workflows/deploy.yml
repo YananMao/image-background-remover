@@ -21,10 +21,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Clean install dependencies
+      - name: Install dependencies
         run: |
-          rm -rf node_modules
-          npm ci
+          npm install
+          ls -la node_modules/.bin/ | head -20
+          ls node_modules/@opennextjs/ 2>/dev/null || echo "@opennextjs not found"
 
       - name: Build Next.js
         run: npx next build
