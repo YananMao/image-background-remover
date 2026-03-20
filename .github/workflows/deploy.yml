@@ -41,6 +41,12 @@ jobs:
         env:
           REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
 
+      - name: Prepare Pages structure
+        run: |
+          cp .open-next/worker.js .open-next/_worker.js
+          mv .open-next/assets/* .open-next/
+          rmdir .open-next/assets
+
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy .open-next --project-name=image-background-remover
         env:
