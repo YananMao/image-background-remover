@@ -90,18 +90,53 @@ npm run deploy:worker
 npm run deploy:pages
 ```
 
-### GitHub Actions
+### Cloudflare API Token 配置
+
+在 Cloudflare Dashboard 创建 API Token，**推荐使用「Edit Cloudflare Workers」模板**，并确保添加以下权限：
+
+| 权限类型 | 权限项 | 操作权限 |
+|---------|--------|---------|
+| Account | Workers Scripts | Edit |
+| Account | Workers Routes | Edit（可选，用到域名路由时必填） |
+| Account | User → User Details | Read |
+| Account | User → Memberships | Read |
+| Zone | Workers Routes | Edit（用到自定义域名时需要） |
+
+> 💡 创建 Token 入口：Cloudflare Dashboard → My Profile → API Tokens → Create Token
+
+### Cloudflare Pages 环境变量配置
+
+前端部署到 Cloudflare Pages 后，需要在 Pages 项目设置中添加环境变量：
+
+1. 进入 Cloudflare Dashboard → Workers & Pages → 选择你的 Pages 项目
+2. Settings → Environment variables
+3. 添加变量：
+
+| 变量名 | 说明 |
+|-------|------|
+| `NEXT_PUBLIC_API_URL` | Worker 部署地址（如 `https://image-background-remover-api.xxx.workers.dev`） |
+| `REMOVEBG_API_KEY` | remove.bg API 密钥 |
+
+> ⚠️ 前端需要通过 `NEXT_PUBLIC_API_URL` 知道 Worker 的地址，确保 API 请求正确路由到后端服务。
+
+### GitHub Actions 自动部署
 
 推送到 `main` 分支或手动触发 workflow 会自动部署。
 
-**所需 GitHub Secrets**：
+**配置 GitHub Secrets**：
 
-- `CLOUDFLARE_API_TOKEN` - Cloudflare API Token
-- `CLOUDFLARE_ACCOUNT_ID` - Cloudflare 账户 ID
-- `REMOVEBG_API_KEY` - remove.bg API Key
-- `NEXT_PUBLIC_API_URL` - **必填** Worker 生产 URL（如 `https://image-background-remover-api.xxx.workers.dev`）。未设置会导致 API 返回 405，因前端会错误地请求 Pages 静态服务而非 Worker
+进入 GitHub 仓库 → Settings → Secrets and variables → Actions，添加以下变量：
 
-**验证部署**：部署完成后，打开浏览器 DevTools -> Network，上传图片后确认请求地址指向 Worker 域名（非 Pages 域名）。
+| Secret 名称 | 说明 |
+|------------|------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API Token（见上方权限配置） |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 账户 ID（在 Dashboard 右侧边栏可找到） |
+| `REMOVEBG_API_KEY` | remove.bg API Key |
+| `NEXT_PUBLIC_API_URL` | **必填** Worker 生产 URL（如 `https://image-background-remover-api.xxx.workers.dev`） |
+
+> ⚠️ 未设置 `NEXT_PUBLIC_API_URL` 会导致 API 返回 405，因为前端会错误地请求 Pages 静态服务而非 Worker。
+
+**验证部署**：部署完成后，打开浏览器 DevTools → Network，上传图片后确认请求地址指向 Worker 域名（非 Pages 域名）。
 
 ## 项目结构
 
