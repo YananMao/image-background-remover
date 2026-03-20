@@ -99,7 +99,9 @@ npm run deploy:pages
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API Token
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare 账户 ID
 - `REMOVEBG_API_KEY` - remove.bg API Key
-- `NEXT_PUBLIC_API_URL` - Worker 生产 URL（如 `https://image-background-remover-api.xxx.workers.dev`，首次部署 Worker 后从输出中获取）
+- `NEXT_PUBLIC_API_URL` - **必填** Worker 生产 URL（如 `https://image-background-remover-api.xxx.workers.dev`）。未设置会导致 API 返回 405，因前端会错误地请求 Pages 静态服务而非 Worker
+
+**验证部署**：部署完成后，打开浏览器 DevTools -> Network，上传图片后确认请求地址指向 Worker 域名（非 Pages 域名）。
 
 ## 项目结构
 

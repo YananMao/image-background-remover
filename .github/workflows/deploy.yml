@@ -57,6 +57,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # 必须设置 NEXT_PUBLIC_API_URL，否则前端会请求 Pages 而非 Worker，导致 405
+      # 在 GitHub Settings -> Secrets -> Actions 中添加，值为 Worker URL，如：
+      # https://image-background-remover-api.<你的子域>.workers.dev
+      - name: Verify API URL
+        run: |
+          if [ -z "$NEXT_PUBLIC_API_URL" ]; then
+            echo "::error::NEXT_PUBLIC_API_URL is not set. Please configure it in GitHub Secrets (Settings -> Secrets and variables -> Actions). Value should be your Worker URL, e.g. https://image-background-remover-api.xxx.workers.dev"
+            exit 1
+          fi
+          echo "API URL configured: $NEXT_PUBLIC_API_URL"
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
       - name: Build Next.js
         run: npm run build
         env:
