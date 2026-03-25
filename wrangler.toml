@@ -12,3 +12,9 @@ ENVIRONMENT = "production"
 #   REMOVEBG_API_KEY=your_api_key_here
 # 生产环境：运行命令设置 secret
 #   npx wrangler secret put REMOVEBG_API_KEY
+
+# D1 数据库配置
+[[d1_databases]]
+binding = "DB"
+database_name = "image-background-remover-db"
+database_id = "cfa93467-1c6e-444b-a939-acedfb02ba3e"
