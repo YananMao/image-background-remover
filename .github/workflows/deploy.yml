@@ -1,8 +1,8 @@
-name: Deploy to Cloudflare
+name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -10,73 +10,33 @@ permissions:
   pull-requests: write
 
 jobs:
-  deploy-worker:
-    name: Deploy Worker (API)
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Deploy to Cloudflare Workers
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Set REMOVEBG_API_KEY secret
-        run: echo -n "${{ secrets.REMOVEBG_API_KEY }}" | npx wrangler secret put REMOVEBG_API_KEY
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  deploy-pages:
-    name: Deploy Pages (Frontend)
-    needs: deploy-worker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install dependencies
-        run: npm ci
-
-      # 必须设置 NEXT_PUBLIC_API_URL，否则前端会请求 Pages 而非 Worker，导致 405
-      # 在 GitHub Settings -> Secrets -> Actions 中添加，值为 Worker URL，如：
-      # https://image-background-remover-api.<你的子域>.workers.dev
-      - name: Verify API URL
         run: |
-          if [ -z "$NEXT_PUBLIC_API_URL" ]; then
-            echo "::error::NEXT_PUBLIC_API_URL is not set. Please configure it in GitHub Secrets (Settings -> Secrets and variables -> Actions). Value should be your Worker URL, e.g. https://image-background-remover-api.xxx.workers.dev"
-            exit 1
-          fi
-          echo "API URL configured: $NEXT_PUBLIC_API_URL"
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          npm ci --include=dev
+          echo "Checking @opennextjs/cloudflare..."
+          ls -la node_modules/@opennextjs/cloudflare 2>/dev/null || echo "NOT FOUND"
 
       - name: Build Next.js
-        run: npm run build
+        run: npx next build
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          REMOVEBG_API_KEY: ${{ secrets.REMOVEBG_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy out --project-name=image-background-remover
+        run: npx wrangler pages deploy .next --project-name=image-background-remover --commit-message="Deploy from GitHub Actions"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
