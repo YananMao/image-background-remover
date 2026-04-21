@@ -2,19 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, COOKIE_NAME, SESSION_DURATION } from "@/lib/auth";
 import type { GoogleUser } from "@/lib/auth";
 
-export const runtime = "nodejs";
-
-async function getDispatcher() {
-  const proxyUrl =
-    process.env.HTTPS_PROXY || process.env.https_proxy ||
-    process.env.HTTP_PROXY || process.env.http_proxy;
-  if (proxyUrl) {
-    const { ProxyAgent } = await import("undici");
-    return new ProxyAgent(proxyUrl);
-  }
-  return undefined;
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
@@ -44,7 +31,6 @@ export async function GET(request: NextRequest) {
         redirect_uri: `${new URL(request.url).origin}/api/auth/callback`,
         grant_type: "authorization_code",
       }),
-      dispatcher: await getDispatcher(),
     });
 
     if (!tokenResponse.ok) {
@@ -56,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Decode ID token payload to extract user info
     const idToken = tokens.id_token;
     const payload = JSON.parse(
-      Buffer.from(idToken.split(".")[1], "base64").toString()
+      atob(idToken.split(".")[1])
     );
 
     const user: GoogleUser = {
