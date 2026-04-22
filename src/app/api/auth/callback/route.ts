@@ -41,9 +41,9 @@ export async function GET(request: NextRequest) {
 
     // Decode ID token payload to extract user info
     const idToken = tokens.id_token;
-    const payload = JSON.parse(
-      atob(idToken.split(".")[1])
-    );
+    const base64 = idToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const payload = JSON.parse(new TextDecoder().decode(bytes));
 
     const user: GoogleUser = {
       email: payload.email,

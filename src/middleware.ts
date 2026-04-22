@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, COOKIE_NAME } from "@/lib/auth";
 
+function forwardHeaders(request: NextRequest) {
+  return NextResponse.next({
+    request: { headers: request.headers },
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow auth routes
   if (pathname.startsWith("/api/auth/")) {
-    return NextResponse.next();
+    return forwardHeaders(request);
   }
 
   // Allow static assets
@@ -15,7 +21,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/favicon") ||
     pathname.includes(".")
   ) {
-    return NextResponse.next();
+    return forwardHeaders(request);
   }
 
   // Check for session cookie

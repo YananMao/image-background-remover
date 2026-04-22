@@ -12,7 +12,6 @@
     "deploy:cf": "npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "hono": "^4.12.8",
     "jose": "^6.2.2",
     "lucide-react": "^0.577.0",
     "next": "16.1.7",
