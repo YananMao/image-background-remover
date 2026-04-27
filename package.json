@@ -12,6 +12,7 @@
     "deploy:cf": "npx opennextjs-cloudflare build && npx opennextjs-cloudflare deploy"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^9.1.1",
     "jose": "^6.2.2",
     "lucide-react": "^0.577.0",
     "next": "16.1.7",

@@ -15,6 +15,11 @@ export async function middleware(request: NextRequest) {
     return forwardHeaders(request);
   }
 
+  // Allow PayPal webhooks (PayPal sends requests without session cookies)
+  if (pathname === "/api/paypal/webhook") {
+    return forwardHeaders(request);
+  }
+
   // Allow static assets
   if (
     pathname.startsWith("/_next/") ||

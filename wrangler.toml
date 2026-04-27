@@ -6,3 +6,9 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "image-background-remover-db"
+database_id = "cfa93467-1c6e-444b-a939-acedfb02ba3e"

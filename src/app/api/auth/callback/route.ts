@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSessionToken, COOKIE_NAME, SESSION_DURATION } from "@/lib/auth";
 import type { GoogleUser } from "@/lib/auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
